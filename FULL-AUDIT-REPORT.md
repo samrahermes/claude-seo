@@ -1,205 +1,320 @@
 # SEO Audit Report — vitaminkorgen.se
 
-**Audit Date:** 2026-02-11
+**Audit Date:** 2026-06-08
 **Tool:** Claude SEO v1.1.0
-**Business Type Detected:** Local Service (Fruktkorgar / Kontorsfrukt — Stockholm)
-**Pages Analyzed:** 8 (full sitemap)
+**Business Type Detected:** Local Service (Fruktkorgar & kontorslösningar — Stockholm)
+**Pages i Sitemap:** 57
+**Pages Indexerade (Google):** 4
 
 ---
 
 ## Executive Summary
 
-### SEO Health Score: 14 / 100
+### SEO Health Score: 18 / 100
 
-| Category | Score | Weight | Weighted |
-|----------|-------|--------|----------|
-| Technical SEO | 15 / 100 | 25% | 3.8 |
-| Content Quality | 10 / 100 | 25% | 2.5 |
-| On-Page SEO | 15 / 100 | 20% | 3.0 |
+| Kategori | Score | Vikt | Viktat |
+|----------|-------|------|--------|
+| Technical SEO | 20 / 100 | 25% | 5.0 |
+| Content Quality | 12 / 100 | 25% | 3.0 |
+| On-Page SEO | 10 / 100 | 20% | 2.0 |
 | Schema / Structured Data | 0 / 100 | 10% | 0.0 |
-| Performance (CWV) | 40 / 100 | 10% | 4.0 |
-| Images | 10 / 100 | 5% | 0.5 |
-| AI Search Readiness | 5 / 100 | 5% | 0.3 |
+| Performance (CWV) | 30 / 100 | 10% | 3.0 |
+| Images | 8 / 100 | 5% | 0.4 |
+| AI Search Readiness | 15 / 100 | 5% | 0.8 |
 
-**Verdict:** Webbplatsen har allvarliga, grundläggande SEO-problem som hindrar sökmotorer från att indexera och ranka sidan. Huvudproblemet är att hela sajten är en React SPA (Single Page Application) med ren klient-rendering (CSR) — ingen server-side rendering (SSR) eller static site generation (SSG). Sökmotorer ser i princip en tom sida.
+**Sammanfattning:** Sajten har rika JS-renderade sidor med produkter, priser, FAQ:er och lokala landningssidor — men allt detta är **osynligt för sökmotorer** eftersom det renderas enbart via JavaScript (CSR). HTML-källan som crawlers ser innehåller `<div id="root"></div>` och 8 ord. Samma title och meta description returneras för alla 57 URL:er. Dessutom pekar sitemap-referensen i robots.txt till fel domän och ~35 location-sidor verkar vara soft 404:or.
 
 ### Topp 5 Kritiska Problem
 
-1. **Klient-rendering utan SSR/SSG** — All content renderas via JavaScript. HTML-källan innehåller `<div id="root"></div>` och 8 ord.
-2. **Identiska meta-taggar på alla sidor** — Samma title och description på alla 8 sidor.
-3. **Noll crawlbart innehåll** — Sökmotorer ser 8 ord istället för faktiskt sidinnehåll.
-4. **Ingen heading-struktur (H1/H2/H3)** — Inga headings i HTML-källan.
-5. **Ingen Schema/Structured Data** — Noll JSON-LD markup.
+1. **Client-Side Rendering (CSR) utan SSR/SSG** — Sökmotorer ser en tom `<div id="root"></div>` med 8 ord
+2. **Identisk title + meta description på alla 57 sidor** — I HTML-källan
+3. **robots.txt sitemap pekar på fel domän** — `frukt-for-foretag.lovable.app/sitemap.xml` istället för `vitaminkorgen.se`
+4. **~35 location-sidor är soft 404:or** — HTTP 200 men visar "Page not found" i renderad vy
+5. **Ingen Schema/JSON-LD, inga canonical tags, inga headings i HTML-källan**
 
 ### Topp 5 Quick Wins
 
-1. Implementera SSR eller pre-rendering för alla sidor.
-2. Unika title-taggar och meta-descriptions per sida.
-3. Lägg till LocalBusiness JSON-LD schema.
-4. Lägg till kanoniska URL:er (canonical tags) på varje sida.
-5. Fixa OG-bild URL (ta bort mellanslag).
+1. Fixa sitemap-referensen i robots.txt till rätt domän
+2. Ta bort soft 404-sidor från sitemap (eller bygg dem med innehåll)
+3. Implementera SSR/pre-rendering (Lovable.app-begränsning — kräver plattformslösning)
+4. Lägg till LocalBusiness JSON-LD schema (kan injiceras server-side)
+5. Sätt unika title-taggar per sida
 
 ---
 
-## 1. Technical SEO (15 / 100)
+## Webbplatsöversikt
+
+### Identifierade Sidor (JS-renderat innehåll)
+
+| Sida | Status | Renderat Innehåll |
+|------|--------|-------------------|
+| / (Startsida) | ✅ Aktiv | Hero, tjänsteöversikt, CTA:er |
+| /bestall | ✅ Aktiv | Beställningsflöde, 6 produkter med priser (166–259 kr), 8% rabatt |
+| /produkter | ✅ Aktiv | Produktöversikt |
+| /provkorg | ✅ Aktiv | "Beställ en gratis provkorg" — landningssida |
+| /kontakt | ✅ Aktiv | Formulär (namn, email, meddelande), telefon, email |
+| /om-oss | ✅ Aktiv | Företagsinfo, hållbarhet, anställdförmåner |
+| /blogg | ✅ Aktiv | 3+ artiklar (publicerade 2026-05-19) |
+| /blogg/tips | ⚠️ Okänt | Kan inte verifiera rendering |
+| /blogg/recept | ⚠️ Okänt | Kan inte verifiera rendering |
+| /blommor | ✅ Aktiv | Blomuthyrning för kontor |
+| /varuautomat | ✅ Aktiv | Varuautomater och kaffemaskiner |
+| /fruktkorg-stockholm | ✅ Aktiv | Landningssida med priser, FAQ, CTA:er |
+| /fruktkorg-foretag | ✅ Aktiv | Företagsfokuserad sida, sjukfrånvaro -20%, priser |
+| /fruktkorg-pa-jobbet | ⚠️ Okänt | Keyword-landningssida |
+| /fruktkorg-kontor | ⚠️ Okänt | Keyword-landningssida |
+| /fruktleverans-foretag | ⚠️ Okänt | Keyword-landningssida |
+| /prova-fruktkorg | ⚠️ Okänt | Keyword-landningssida |
+| /fruktlada | ⚠️ Okänt | Keyword-landningssida |
+| /produkt/fruktkorg-original | ⚠️ Okänt | Produktsida |
+| /produkt/fruktkorg-premium | ⚠️ Okänt | Produktsida |
+| /produkt/fruktkorg-banan | ⚠️ Okänt | Produktsida |
+| /fruktkorg/[35 områden] | ❌ Soft 404 | "Oops! Page not found" |
+
+### Kontaktinformation (från JS-renderat)
+
+- **Telefon:** 010-183 98 36
+- **Email:** info@vitaminkorgen.se
+- **Företag:** VitaminKorgen AB
+- **Leveransområde:** Stockholm, Södertälje, Uppsala (31+ stadsdelar)
+- **Grundat:** 2021
+- **Kunder:** 150+ företag
+
+### Produkter (från /bestall)
+
+| Produkt | Vikt | Ordinarie Pris | Kampanjpris (8% rabatt) |
+|---------|------|----------------|------------------------|
+| Fruktkorg Premium | 4 kg | 250 kr | 230 kr |
+| Fruktkorg Banan Plus | 4 kg | 230 kr | 212 kr |
+| Fruktkorg Supreme | 4 kg | 230 kr | 212 kr |
+| Fruktkorg Original | 4 kg | 220 kr | 202 kr |
+| Fruktkorg Bas | 4 kg | 180 kr | 166 kr |
+| Fruktkorg Sicilien | 4 kg | 282 kr | 259 kr |
+
+---
+
+## 1. Technical SEO (20 / 100)
 
 ### 1.1 Crawlability
 
 | Check | Status | Detaljer |
 |-------|--------|----------|
-| robots.txt | ✅ PASS | Finns och tillåter alla crawlers. Sitemap refererad. |
-| Sitemap.xml | ⚠️ VARNING | Finns med 8 URL:er. Men /varuautomater-kaffemaskin saknas i sitemap trots att den är indexerad av Google. |
-| Server-Side Rendering | ❌ FAIL | Ren CSR (React SPA). `<div id="root"></div>` — ingen renderad HTML. |
-| Crawlbart innehåll | ❌ FAIL | Bara 8 ord synliga i HTML-källan för alla sidor. |
-| Redirect-kedjor | ✅ PASS | Inga onödiga redirects detekterade. |
-| HTTP Status | ✅ PASS | Alla sidor returnerar 200. |
+| robots.txt | ⚠️ VARNING | Finns och tillåter alla crawlers, inkl. AI-crawlers. **MEN** sitemap-referens pekar på fel domän: `frukt-for-foretag.lovable.app/sitemap.xml` |
+| Sitemap.xml | ⚠️ VARNING | 57 URL:er men: inga lastmod-datum, ~35 location-sidor är soft 404:or |
+| Server-Side Rendering | ❌ KRITISK | Ren CSR (React SPA). `<div id="root"></div>` — ingen renderad HTML |
+| Crawlbart innehåll | ❌ KRITISK | 8 ord synliga i HTML-källan för alla sidor |
+| Google Site Verification | ✅ PASS | `3SrrgJPyzJjimRlKkyreCjVOkSsJYUbI7KxNfxH83RQ` |
+| HTTP Status | ⚠️ VARNING | Alla sidor returnerar 200, inklusive soft 404:or |
 
-### 1.2 Indexability
+### 1.2 robots.txt Analys
+
+```
+User-agent: Googlebot       → Allow: /
+User-agent: Bingbot          → Allow: /
+User-agent: Twitterbot       → Allow: /
+User-agent: facebookexternalhit → Allow: /
+User-agent: GPTBot           → Allow: /
+User-agent: ChatGPT-User     → Allow: /
+User-agent: Google-Extended   → Allow: /
+User-agent: PerplexityBot    → Allow: /
+User-agent: CCBot             → Allow: /
+User-agent: anthropic-ai     → Allow: /
+User-agent: ClaudeBot         → Allow: /
+User-agent: cohere-ai        → Allow: /
+User-agent: *                → Allow: /
+
+Sitemap: https://frukt-for-foretag.lovable.app/sitemap.xml  ← FEL DOMÄN!
+```
+
+**Problem:** Sitemap-URL pekar på Lovable.app-subdomänen istället för `https://vitaminkorgen.se/sitemap.xml`. Google följer denna referens och kan missa sitemapen.
+
+### 1.3 Sitemap Analys
+
+| Check | Status |
+|-------|--------|
+| Antal URL:er | 57 |
+| lastmod | ❌ Saknas på alla URL:er |
+| changefreq | Weekly/Monthly (varierar) |
+| Priority | 0.6–1.0 (rimligt) |
+| Soft 404:or i sitemap | ❌ ~35 URL:er (/fruktkorg/[area]) visar 404-innehåll |
+| Korrekt domän | ✅ URL:er pekar på vitaminkorgen.se |
+
+### 1.4 Indexability
 
 | Check | Status | Detaljer |
 |-------|--------|----------|
-| Canonical tags | ❌ FAIL | Saknas på alla sidor. |
-| meta robots | ✅ PASS | Inga noindex-direktiv (men utan crawlbart innehåll spelar det liten roll). |
-| Google-indexering | ❌ FAIL | Bara 3 av 8+ sidor indexerade (/, /produkter, /varuautomater-kaffemaskin). |
-| Duplicerat innehåll | ❌ FAIL | Alla sidor returnerar identisk HTML till sökmotorer. |
-| Hreflang | ❌ FAIL | Saknas. Sajten har `lang="sv"` men inga hreflang-taggar. |
+| Canonical tags | ❌ KRITISK | Saknas på alla sidor |
+| meta robots | ✅ PASS | Inga noindex-direktiv |
+| Google-indexering | ❌ DÅLIG | 4 av 57 sidor indexerade (7%) |
+| Duplicerat innehåll | ❌ KRITISK | Alla sidor returnerar identisk HTML |
 
-### 1.3 Security
+**Indexerade sidor (Google):**
 
-| Check | Status | Detaljer |
-|-------|--------|----------|
-| HTTPS | ✅ PASS | Aktiv med giltigt certifikat. |
-| HSTS | ✅ PASS | `strict-transport-security: max-age=31536000; includeSubDomains` |
+| URL | Indexerad | I Sitemap |
+|-----|-----------|-----------|
+| / | ✅ | ✅ |
+| /kontakt | ✅ | ✅ |
+| /produkter | ✅ | ✅ |
+| /varuautomater-kaffemaskin (www.) | ✅ | ❌ Saknas |
+
+### 1.5 Security Headers
+
+| Header | Status | Värde |
+|--------|--------|-------|
+| HTTPS | ✅ PASS | Aktiv |
+| HSTS | ✅ PASS | `max-age=31536000; includeSubDomains` |
 | Referrer-Policy | ✅ PASS | `strict-origin-when-cross-origin` |
 | X-Content-Type-Options | ✅ PASS | `nosniff` |
-| Content-Security-Policy | ❌ FAIL | Saknas. |
-| X-Frame-Options | ❌ FAIL | Saknas. |
-| Permissions-Policy | ❌ FAIL | Saknas. |
+| Content-Security-Policy | ❌ SAKNAS | |
+| X-Frame-Options | ❌ SAKNAS | |
+| Permissions-Policy | ❌ SAKNAS | |
+| Cache-Control | ⚠️ VARNING | `no-cache, must-revalidate, max-age=0` — ingen browser-caching |
 
-### 1.4 URL Structure
+### 1.6 URL Structure
 
-| Check | Status | Detaljer |
-|-------|--------|----------|
-| Rena URL:er | ✅ PASS | Bra URL-struktur (/produkter, /blogg, /om-oss, /kontakt). |
-| URL-konsistens | ⚠️ VARNING | Sitemap har /varuautomat men Google har indexerat /varuautomater-kaffemaskin — inkonsekvent. |
-| Trailing slashes | ✅ PASS | Konsekvent utan trailing slashes. |
-
-### 1.5 Mobile Optimization
-
-| Check | Status | Detaljer |
-|-------|--------|----------|
-| Viewport meta | ✅ PASS | `<meta name="viewport" content="width=device-width, initial-scale=1.0">` |
-| Responsiv | ⚠️ OKÄNT | Kan ej verifieras utan JS-rendering. |
-
-### 1.6 Core Web Vitals (Uppskattning baserad på källkod)
-
-| Metric | Uppskattning | Tröskel | Status |
-|--------|-------------|---------|--------|
-| LCP | >4s (troligt) | <2.5s | ❌ FAIL |
-| INP | Okänt | <200ms | ⚠️ OKÄNT |
-| CLS | Okänt | <0.1 | ⚠️ OKÄNT |
-
-**Orsak:** En ren CSR-applikation kräver att hela JavaScript-bundlen laddas, parsas och exekveras innan första meningsfulla innehåll visas. Detta ger typiskt dåliga LCP-värden.
+| Check | Status |
+|-------|--------|
+| Rena URL:er | ✅ PASS |
+| Svensk URL-struktur | ✅ PASS (/produkter, /om-oss, /kontakt) |
+| Keyword-URL:er | ✅ BRA (/fruktkorg-stockholm, /fruktkorg-foretag) |
+| Location-URL:er | ⚠️ VARNING — /fruktkorg/[area] finns i sitemap men sidor är soft 404:or |
+| www vs non-www | ⚠️ VARNING — www.vitaminkorgen.se/varuautomater-kaffemaskin indexerad (inkonsekvent) |
 
 ### 1.7 JavaScript Rendering
 
-| Check | Status | Detaljer |
-|-------|--------|----------|
-| Rendering-typ | ❌ CSR | Ren klient-rendering via React. |
-| JS Bundle | ⚠️ VARNING | `assets/index-BsmIKI_A.js` (modul) — storleken okänd men SPA-bundles tenderar att vara stora. |
-| Hosting | ℹ️ INFO | Lovable.app (no-code plattform) via Cloudflare CDN. |
+| Check | Status |
+|-------|--------|
+| Rendering-typ | ❌ CSR (React SPA via Lovable.app) |
+| HTML Body | `<div id="root"></div>` |
+| JS Bundle | `assets/index-BDwX_yjH.js` (module) |
+| CSS Bundle | `assets/index-bYK_tMtE.css` |
+| Third-party JS | GTM, GA4, Flock, Tidio, Lovable events (5 st) |
+| OG/Twitter tags | ⚠️ "Set dynamically by SEOHead component" — ej i HTML-källan |
+| Information leakage | ⚠️ Lovable event script exponerar commit SHA och deployment tokens |
+
+### 1.8 Core Web Vitals (Uppskattning)
+
+| Metric | Uppskattning | Tröskel | Status |
+|--------|-------------|---------|--------|
+| LCP | >4s (troligt) | <2.5s | ❌ Troligt FAIL |
+| INP | Okänt | <200ms | ⚠️ Okänt |
+| CLS | Okänt | <0.1 | ⚠️ Okänt |
+
+CSR + 5 third-party scripts + `cache-control: no-cache` = troligtvis dålig LCP.
 
 ---
 
-## 2. Content Quality (10 / 100)
+## 2. Content Quality (12 / 100)
 
 ### 2.1 E-E-A-T Assessment
 
 | Signal | Score | Detaljer |
 |--------|-------|----------|
-| Experience | 5 / 100 | Ingen synlig förstahandsupplevelse i HTML-källan. |
-| Expertise | 5 / 100 | Inga synliga expertissignaler. |
-| Authoritativeness | 10 / 100 | Meta-beskrivning nämner "Sedan 2021" och "150+ företag" — men ej crawlbart. |
-| Trustworthiness | 15 / 100 | HTTPS OK, men ingen kontaktinfo i crawlbar HTML. |
-| **Totalt E-E-A-T** | **9 / 100** | |
+| Experience | 15 / 100 | JS-renderat: nämner "sedan 2021", "150+ företag", sjukfrånvaro -20% — men ej crawlbart |
+| Expertise | 10 / 100 | Inga synliga expertissignaler i HTML. I JS: tips, recept, hälsoinformation |
+| Authoritativeness | 10 / 100 | Ingen extern bekräftelse synlig. Google Site Verification tillagt |
+| Trustworthiness | 20 / 100 | HTTPS ✅, kontaktinfo (JS-renderat), Tidio chat tillagd |
+| **Totalt E-E-A-T** | **14 / 100** | |
 
-### 2.2 Content per sida (HTML-källa)
+### 2.2 Crawlbart vs JS-renderat Innehåll
 
-| Sida | Ord | Min. krav | Status |
-|------|-----|-----------|--------|
-| / (Startsida) | 8 | 500 | ❌ FAIL (98% under minimum) |
-| /produkter | 8 | 800 (Tjänstesida) | ❌ FAIL |
-| /blogg | 8 | N/A (listning) | ❌ FAIL |
-| /om-oss | 8 | 500 | ❌ FAIL |
-| /kontakt | 8 | N/A | ❌ FAIL |
-| /offertforfragan | 8 | N/A | ❌ FAIL |
-| /blommor | 8 | 800 (Tjänstesida) | ❌ FAIL |
-| /varuautomat | 8 | 800 (Tjänstesida) | ❌ FAIL |
+| Aspekt | I HTML (crawlbart) | I JS (ej crawlbart) |
+|--------|-------------------|---------------------|
+| Ord | 8 | Hundratals–tusentals |
+| Produkter | 0 | 6 med priser |
+| FAQ:er | 0 | Ja, på landningssidor |
+| Kontaktinfo | 0 | Telefon, email, adress |
+| Kundstatistik | 0 | 150+ företag, sedan 2021 |
+| Blogginlägg | 0 | 3+ artiklar |
+| Testimonials | 0 | Troligtvis finns |
 
-**Alla sidor visar bara 8 ord för sökmotorer** på grund av CSR-problemet.
+### 2.3 Content per Sidtyp (HTML-källa)
 
-### 2.3 Duplicerat Innehåll
+| Sidtyp | Antal | Ord i HTML | Min. krav | Status |
+|--------|-------|------------|-----------|--------|
+| Startsida | 1 | 8 | 500 | ❌ FAIL |
+| Produktsidor | 3 | 8 | 400 | ❌ FAIL |
+| Tjänstesidor | 8 | 8 | 800 | ❌ FAIL |
+| Blogg | 3+ | 8 | 1 500 | ❌ FAIL |
+| Location-sidor | 35 | 8 (soft 404) | 500 | ❌ FAIL |
+| Om oss | 1 | 8 | 500 | ❌ FAIL |
+| Kontakt | 1 | 8 | N/A | ❌ FAIL |
 
-**100% duplicerat** — alla sidor returnerar exakt samma HTML till sökmotorer. Detta innebär att Google behandlar hela sajten som en enda sida med samma innehåll.
+### 2.4 Location Pages Quality Assessment
 
-### 2.4 AI-genererat Innehåll
+**35 location-sidor** i sitemap (`/fruktkorg/[stadsdel]`) — ALLA visar "Oops! Page not found" (soft 404). Dessa sidor:
+- Slösar Google crawl budget
+- Skadar sajtens kvalitetssignaler
+- Borde antingen byggas med unikt lokalt innehåll ELLER tas bort från sitemap
 
-Sajten är byggd med Lovable.app (en AI-driven no-code plattform). Twitter-kortet refererar till `@lovable_dev`. Det innebär i sig inget negativt, men E-E-A-T-signaler och unikt innehåll är extra viktigt att säkerställa.
+**Quality Gate Varning:** 35 location-sidor överstiger 30-gränsen. Om de byggs ut krävs minst 60% unikt innehåll per sida.
+
+### 2.5 Blogg
+
+3+ publicerade artiklar (2026-05-19):
+1. Hammarby Sjöstad Guide — fruktkorgar till techkontor
+2. Solna Business Area — Arenastaden, Solna Business Park
+3. Södermalm — SoFo till Hornstull
+
+**Positivt:** Lokalt fokuserat, relevant innehåll.
+**Problem:** Ej crawlbart i HTML-källan.
 
 ---
 
-## 3. On-Page SEO (15 / 100)
+## 3. On-Page SEO (10 / 100)
 
-### 3.1 Title Tags
+### 3.1 Title Tags (HTML-källa)
 
-| Sida | Title | Status |
-|------|-------|--------|
-| Alla 8 sidor | "Fruktkorg på jobbet Stockholm \| Fruktkorgar till kontoret - Vitaminkorgen" | ❌ FAIL — Identisk title på alla sidor |
+| Sida | Title |
+|------|-------|
+| **Alla 57 sidor** | "Fruktkorg på jobbet Stockholm \| Fruktkorgar till kontoret - Vitaminkorgen" |
 
-**Problem:**
-- Samma title överallt — Google kan inte särskilja sidorna.
-- Title-längd: 72 tecken (OK men kunde optimeras per sida).
+❌ **KRITISK:** Identisk title på alla sidor. Sajten har troligtvis en dynamisk SEOHead React-komponent som sätter unika titles via JavaScript, men dessa injiceras EFTER sidladdning och finns inte i HTML-källan.
 
-### 3.2 Meta Descriptions
+### 3.2 Meta Descriptions (HTML-källa)
 
-| Sida | Description | Status |
-|------|-------------|--------|
-| Alla 8 sidor | "Fruktkorg på jobbet Stockholm ✓ Vi levererar färska fruktkorgar..." | ❌ FAIL — Identisk description |
+| Sida | Description |
+|------|-------------|
+| **Alla 57 sidor** | "Fruktkorg på jobbet Stockholm ✓ Vi levererar färska fruktkorgar direkt till ert kontor..." |
 
-**Problem:** Samma meta description på alla sidor. Varje sida behöver en unik, sidspecifik description.
+❌ **KRITISK:** Identisk description överallt.
 
 ### 3.3 OG & Twitter Tags
 
-| Check | Status | Problem |
-|-------|--------|---------|
-| OG Title | ⚠️ VARNING | Skiljer sig från page title (inkonsekvent). |
-| OG Description | ⚠️ VARNING | Samma på alla sidor. |
-| OG Image | ❌ FAIL | URL innehåller mellanslag: `...VitaminKorgen 2.jpg` — kan orsaka problem vid delning. |
-| Twitter Site | ❌ FAIL | Pekar på `@lovable_dev` istället för företagets eget konto. |
-| Twitter Card | ✅ PASS | `summary_large_image` — korrekt typ. |
+| Tag | Status | Problem |
+|-----|--------|---------|
+| og:title | ❌ SAKNAS | Kommentar i HTML: "set dynamically by SEOHead component" — men finns ej i källan |
+| og:description | ❌ SAKNAS | Samma problem |
+| og:image | ✅ FINNS | Cloudflare R2 CDN-bild (automatiskt genererad av Lovable) |
+| twitter:image | ✅ FINNS | Samma R2-bild |
+| twitter:card | ❌ SAKNAS | Inte i HTML-källan |
+| twitter:site | ❌ SAKNAS | Borttagen (var @lovable_dev förut — förbättring) |
 
-### 3.4 Heading Structure
+### 3.4 Heading Structure (HTML-källa)
 
-| Check | Status |
-|-------|--------|
-| H1 | ❌ FAIL — Finns ej i HTML-källan (0 st) |
-| H2 | ❌ FAIL — Finns ej i HTML-källan (0 st) |
-| H3 | ❌ FAIL — Finns ej i HTML-källan (0 st) |
-
-### 3.5 Internal Linking
-
-| Check | Status |
-|-------|--------|
-| Interna länkar i HTML | ❌ FAIL — 0 interna länkar synliga i källkoden |
-| Navigation | ❌ FAIL — Ej crawlbar (renderas av JS) |
-
-### 3.6 Övriga meta-taggar
-
-| Tag | Värde | Status |
+| Tag | Antal | Status |
 |-----|-------|--------|
-| `meta keywords` | "fruktkorg på jobbet stockholm, fruktkorgar stockholm..." | ⚠️ ONÖDIG — Google ignorerar meta keywords sedan 2009. |
-| `meta author` | "Vitaminkorgen AB" | ✅ OK |
-| `lang` attribut | `sv` | ✅ PASS |
+| H1 | 0 | ❌ KRITISK |
+| H2 | 0 | ❌ KRITISK |
+| H3 | 0 | ❌ KRITISK |
+
+Headings existerar troligtvis i det JS-renderade innehållet men finns inte i HTML-källan.
+
+### 3.5 Internal Linking (HTML-källa)
+
+| Check | Status |
+|-------|--------|
+| Interna länkar | 0 — ❌ Ej crawlbart |
+| Navigation | Finns i JS (8 huvudlänkar) men ej i HTML |
+| Footer-länkar | Finns i JS (30+ områdeslänkar) men ej i HTML |
+| Breadcrumbs | Ej identifierade |
+
+### 3.6 Meta Keywords
+
+```html
+<meta name="keywords" content="fruktkorg på jobbet stockholm, fruktkorgar stockholm...">
+```
+⚠️ **ONÖDIG** — Google ignorerar meta keywords sedan 2009. Avslöjar sökordsstrategi för konkurrenter.
 
 ---
 
@@ -207,171 +322,237 @@ Sajten är byggd med Lovable.app (en AI-driven no-code plattform). Twitter-korte
 
 ### 4.1 Befintlig Schema
 
-**Ingen Schema/JSON-LD hittad** på någon sida.
+**Ingen Schema/JSON-LD hittad** i HTML-källan på någon sida.
 
 ### 4.2 Rekommenderade Schema-typer
 
-| Schema-typ | Prioritet | Var |
-|------------|-----------|-----|
-| LocalBusiness | Kritisk | Startsidan |
-| Service | Hög | /produkter, /blommor, /varuautomat |
-| Organization | Hög | /om-oss |
-| BreadcrumbList | Medium | Alla sidor |
-| Product | Medium | /produkter (individuella produkter) |
-| ContactPage | Medium | /kontakt |
-| WebSite (med SearchAction) | Low | Startsidan |
+| Schema-typ | Prioritet | Var | Påverkan |
+|------------|-----------|-----|----------|
+| LocalBusiness | Kritisk | / | Google Business Profile, Knowledge Panel |
+| Product | Hög | /produkt/*, /bestall | Rich results med priser |
+| Service | Hög | /blommor, /varuautomat | Tjänstebeskrivning |
+| Organization | Hög | /om-oss | Företagsinformation |
+| BreadcrumbList | Medium | Alla sidor | Navigationsstruktur |
+| FAQPage | Medium | /fruktkorg-stockholm, /fruktkorg-foretag | FAQ rich results |
+| BlogPosting | Medium | /blogg/* | Artikelmarkeringar |
+| ContactPage | Låg | /kontakt | Kontaktinformation |
+| WebSite + SearchAction | Låg | / | Sitelinks searchbox |
+| AggregateOffer | Låg | /produkter | Prisspann |
 
-### 4.3 Exempel: LocalBusiness Schema
+### 4.3 LocalBusiness Schema — Rekommenderad Implementation
 
 ```json
 {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   "name": "Vitaminkorgen",
-  "description": "Vi levererar färska fruktkorgar på jobbet i Stockholm",
+  "legalName": "VitaminKorgen AB",
+  "description": "Vi levererar färska fruktkorgar till kontor i Stockholm, Södertälje och Uppsala",
   "url": "https://vitaminkorgen.se",
-  "telephone": "[TELEFONNUMMER]",
+  "telephone": "010-183 98 36",
+  "email": "info@vitaminkorgen.se",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Stockholm",
+    "addressRegion": "Stockholms län",
     "addressCountry": "SE"
   },
-  "areaServed": {
-    "@type": "City",
-    "name": "Stockholm"
-  },
+  "areaServed": [
+    { "@type": "City", "name": "Stockholm" },
+    { "@type": "City", "name": "Södertälje" },
+    { "@type": "City", "name": "Uppsala" }
+  ],
   "foundingDate": "2021",
-  "priceRange": "$$"
+  "priceRange": "166–259 kr/vecka",
+  "paymentAccepted": "Faktura",
+  "openingHours": "Mo-Fr 08:00-17:00",
+  "image": "https://vitaminkorgen.se/[logotyp].webp",
+  "sameAs": []
+}
+```
+
+### 4.4 Product Schema — Rekommenderad Implementation
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Fruktkorg Original",
+  "description": "Balanserad mix av bananer, äpplen, päron och apelsiner, toppad med säsongsfrukt",
+  "brand": { "@type": "Brand", "name": "Vitaminkorgen" },
+  "offers": {
+    "@type": "Offer",
+    "price": "220",
+    "priceCurrency": "SEK",
+    "priceValidUntil": "2026-12-31",
+    "availability": "https://schema.org/InStock",
+    "url": "https://vitaminkorgen.se/produkt/fruktkorg-original"
+  },
+  "weight": { "@type": "QuantitativeValue", "value": "4", "unitCode": "KGM" }
 }
 ```
 
 ---
 
-## 5. Performance (40 / 100)
+## 5. Performance (30 / 100)
 
 ### 5.1 Positiva signaler
 
-- **Cloudflare CDN** — Bra geografisk distribution och caching.
-- **HTTP/2** — Stöds.
-- **Gzip/Deflate** — Accept-Encoding finns.
-- **ETag** — Korrekt caching-header.
+- **Cloudflare CDN** — Global edge-distribution
+- **HTTP/2** — Stöds
+- **HSTS** — Korrekt konfigurerat
 
 ### 5.2 Negativa signaler
 
-- **CSR-arkitektur** — JavaScript måste laddas, parsas och exekveras innan innehåll visas.
-- **Inga preload/prefetch hints** i HTML-källan.
-- **Google Analytics + Flock Analytics** — Två analytics-script som potentiellt blockerar rendering.
-- **Ingen preconnect** till externa domäner (googleapis.com, googletagmanager.com).
+| Problem | Påverkan |
+|---------|----------|
+| CSR-arkitektur | JavaScript måste ladda, parsas, exekveras innan innehåll visas |
+| `cache-control: no-cache, must-revalidate, max-age=0` | Ingen browser-caching — varje besök hämtar om allt |
+| 5 third-party scripts | GTM, GA4, Flock, Tidio, Lovable events |
+| Inga preload/preconnect hints | Inga resource hints i HTML |
+| Dubbla analytics | GA4 + Flock + GTM = redundant |
 
-### 5.3 Resursanalys
+### 5.3 Laddade Resurser
 
 | Resurs | Typ | Observation |
 |--------|-----|-------------|
-| `assets/index-BsmIKI_A.js` | JS Module | Hela applikationsbundlen — ej code-split synligt i HTML. |
-| `assets/index-DbWCcWDi.css` | CSS | Stilmall. |
-| `gtag/js?id=G-JZJV317Q2E` | Analytics | Externt script, asynkront. |
-| `~flock.js` | Analytics | Ytterligare analytics — deferred. |
+| `assets/index-BDwX_yjH.js` | JS Module | Hela SPA-bundlen |
+| `assets/index-bYK_tMtE.css` | CSS | Stilmall |
+| `gtm.js?id=GTM-56Z5QZHQ` | GTM | Google Tag Manager |
+| `gtag/js?id=G-JZJV317Q2E` | GA4 | Google Analytics 4 |
+| `/~flock.js` | Analytics | Flock analytics |
+| `/__l5e/events.js` | Tracking | Lovable.app event tracking |
+| `code.tidio.co/[id].js` | Chat | Tidio livechatt |
+
+### 5.4 Caching
+
+```
+cache-control: no-cache, must-revalidate, max-age=0
+```
+
+❌ **Ingen caching alls.** Varje sidladdning hämtar hela HTML-dokumentet från servern. Assets (JS/CSS) kan cachas via Cloudflare, men HTML-dokumentet aldrig.
 
 ---
 
-## 6. Images (10 / 100)
+## 6. Images (8 / 100)
 
 ### 6.1 HTML-bildanalys
 
 **0 bilder i HTML-källan** — alla bilder laddas via JavaScript.
 
-### 6.2 OG/Twitter-bild
+### 6.2 OG Image
 
-| Check | Status | Detaljer |
-|-------|--------|----------|
-| OG Image | ⚠️ VARNING | URL har mellanslag: `...VitaminKorgen 2.jpg` |
-| Hosting | ℹ️ INFO | Hostad på `storage.googleapis.com` (Google Cloud Storage) |
-| Alt-text | ❌ FAIL | Ingen alt-text möjlig att verifiera i källkod. |
-| Bildformat | ⚠️ OKÄNT | JPG (borde använda WebP/AVIF för modern optimering). |
-| Lazy loading | ❌ FAIL | Inga `loading="lazy"` attribut i HTML. |
-| Dimensioner | ❌ FAIL | Inga width/height-attribut i HTML. |
+| Check | Status |
+|-------|--------|
+| Finns | ✅ Ja |
+| URL | Cloudflare R2 CDN (`pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev`) |
+| Format | PNG (borde vara WebP) |
+| Automatiskt genererad | Ja — Lovable.app preview-bild |
+| Anpassad per sida | ❌ Samma bild på alla sidor |
+
+### 6.3 Rekommendationer (efter SSR-implementation)
+
+- Sätt `alt`-attribut på alla bilder (svenska, beskrivande)
+- Sätt `width` + `height` (förhindrar CLS)
+- Använd `loading="lazy"` under fold
+- Konvertera till WebP/AVIF
+- Implementera `srcset` för responsiva bilder
+- Skapa unika OG-bilder per sidtyp
 
 ---
 
-## 7. AI Search Readiness / GEO (5 / 100)
+## 7. AI Search Readiness / GEO (15 / 100)
 
 ### 7.1 AI Crawler Access
 
-| Crawler | Åtkomst | Problem |
-|---------|---------|---------|
-| Googlebot | ✅ Tillåten | Ser bara 8 ord (CSR-problem) |
-| GPTBot | ✅ Tillåten | Ser bara 8 ord |
-| ClaudeBot | ✅ Tillåten | Ser bara 8 ord |
-| PerplexityBot | ✅ Tillåten | Ser bara 8 ord |
-| Bingbot | ✅ Tillåten | Ser bara 8 ord |
+| Crawler | robots.txt | Crawlbart Innehåll |
+|---------|-----------|-------------------|
+| GPTBot | ✅ Allow | ❌ 8 ord |
+| ChatGPT-User | ✅ Allow | ❌ 8 ord |
+| ClaudeBot | ✅ Allow | ❌ 8 ord |
+| anthropic-ai | ✅ Allow | ❌ 8 ord |
+| PerplexityBot | ✅ Allow | ❌ 8 ord |
+| Google-Extended | ✅ Allow | ❌ 8 ord |
+| CCBot | ✅ Allow | ❌ 8 ord |
+| cohere-ai | ✅ Allow | ❌ 8 ord |
 
-**Alla crawlers tillåts i robots.txt, men det finns inget crawlbart innehåll.**
+**Positivt:** Alla AI-crawlers explicit tillåtna (bättre än förra auditen).
+**Problem:** Inget innehåll att crawla.
 
 ### 7.2 llms.txt
 
-❌ **Saknas** — Ingen `/.well-known/llms.txt` finns. Returnerar 404.
+❌ **Saknas** — Ingen `/.well-known/llms.txt` hittad.
 
 ### 7.3 Citability Score
 
 | Faktor | Score | Detaljer |
 |--------|-------|----------|
-| Quotable Facts | 0 / 20 | Inga citeringsbara fakta i HTML |
+| Quotable Facts | 2 / 20 | Meta description nämner "150+ företag" |
 | Structured Data | 0 / 20 | Ingen schema markup |
-| Clear Hierarchy | 0 / 20 | Inga headings |
-| Passage Length | 0 / 20 | Inga textpassager |
-| Authority Signals | 5 / 20 | Meta-taggar nämner "150+ företag" och "Sedan 2021" |
-| **Totalt** | **5 / 100** | |
+| Clear Hierarchy | 0 / 20 | Inga headings i HTML |
+| Passage Length | 0 / 20 | Inga textpassager i HTML |
+| Authority Signals | 5 / 20 | Google Site Verification, fast domän sedan 2021 |
+| **Totalt** | **7 / 100** | |
 
-### 7.4 Brand Mention Signals
+### 7.4 Brand Mentions
 
-Svagt varumärkesrykte online — begränsad synlighet i AI-sökresultat. Utan crawlbart innehåll kan AI-modeller inte referera till sajten som källa.
+Sajten har potential att bli citerad i AI-svar om "fruktkorg kontor stockholm" men saknar crawlbart innehåll för AI-modeller att referera till. De rika landningssidorna (/fruktkorg-stockholm, /fruktkorg-foretag) med priser, FAQ:er och statistik ("sjukfrånvaro -20%") vore utmärkta för AI-citeringar — OM de var crawlbara.
 
 ---
 
 ## Appendix
 
-### A. Indexeringsstatus (Google)
-
-| URL | Indexerad | I Sitemap |
-|-----|-----------|-----------|
-| / | ✅ Ja | ✅ Ja |
-| /produkter | ✅ Ja | ✅ Ja |
-| /varuautomater-kaffemaskin | ✅ Ja | ❌ Nej |
-| /blogg | ❌ Nej | ✅ Ja |
-| /om-oss | ❌ Nej | ✅ Ja |
-| /kontakt | ❌ Nej | ✅ Ja |
-| /offertforfragan | ❌ Nej | ✅ Ja |
-| /blommor | ❌ Nej | ✅ Ja |
-| /varuautomat | ❌ Nej | ✅ Ja |
-
-### B. Sitemap.xml Analys
-
-- **Antal URL:er:** 8
-- **Lastmod:** 2026-01-22 (alla sidor)
-- **Changefreq:** Weekly (de flesta), Monthly (om-oss, kontakt)
-- **URL som saknas:** /varuautomater-kaffemaskin (indexerad men ej i sitemap)
-- **URL-inkonsistens:** /varuautomat i sitemap vs /varuautomater-kaffemaskin indexerad
-
-### C. robots.txt Analys
-
-```
-User-agent: Googlebot → Allow: /
-User-agent: Bingbot → Allow: /
-User-agent: Twitterbot → Allow: /
-User-agent: facebookexternalhit → Allow: /
-User-agent: * → Allow: /
-Sitemap: https://vitaminkorgen.se/sitemap.xml
-```
-
-**Status:** ✅ Korrekt konfigurerad men saknar specifika regler för AI-crawlers (GPTBot, ClaudeBot, PerplexityBot).
-
-### D. Hosting & Infrastruktur
+### A. Hosting & Infrastruktur
 
 | Parameter | Värde |
 |-----------|-------|
 | Plattform | Lovable.app (AI-driven no-code) |
+| Subdomän | frukt-for-foretag.lovable.app |
 | CDN | Cloudflare |
-| Server | Envoy (proxy) |
 | Protokoll | HTTP/2 |
 | SSL | Giltigt certifikat |
-| Analytics | Google Analytics 4 (G-JZJV317Q2E) + Flock Analytics |
+| Cookie-domän | vitaminkorgen.se (förbättring — var lovable.app förut) |
+| Analytics | Google Tag Manager + GA4 + Flock Analytics |
+| Chat | Tidio |
+| Build-info | Commit SHA exponerat via Lovable event script |
+
+### B. Jämförelse med Förra Auditen (2026-02-11)
+
+| Aspekt | Feb 2026 | Jun 2026 | Förändring |
+|--------|----------|----------|------------|
+| SEO Score | 14 | 18 | +4 |
+| Sidor i sitemap | 8 | 57 | +49 |
+| Google-indexerade | 3 | 4 | +1 |
+| AI crawlers i robots.txt | 0 | 8 | +8 |
+| Google Tag Manager | Nej | Ja | ✅ |
+| Google Site Verification | Nej | Ja | ✅ |
+| Live chat (Tidio) | Nej | Ja | ✅ |
+| Cookie-domän | lovable.app | vitaminkorgen.se | ✅ |
+| Twitter @lovable_dev | Ja | Borttagen | ✅ |
+| OG/Twitter tags i HTML | Delvis | Nästan inga | ⬇️ |
+| Soft 404-sidor | 0 | ~35 | ⬇️ |
+| Third-party scripts | 3 | 5 | ⬇️ |
+| Browser caching | Ej testat | Helt avaktiverat | ⬇️ |
+| CSR-problem | Ja | Ja (oförändrat) | ➡️ |
+| Schema markup | 0 | 0 | ➡️ |
+| Canonical tags | 0 | 0 | ➡️ |
+| Headings i HTML | 0 | 0 | ➡️ |
+
+### C. Soft 404 Location Pages (35 st)
+
+Följande sidor i sitemap returnerar HTTP 200 men visar "Oops! Page not found":
+
+```
+/fruktkorg/ostermalm     /fruktkorg/kungsholmen    /fruktkorg/sodermalm
+/fruktkorg/gamla-stan     /fruktkorg/gardet         /fruktkorg/ropsten
+/fruktkorg/stadshagen     /fruktkorg/fridhemsplan   /fruktkorg/hammarby-sjostad
+/fruktkorg/solna          /fruktkorg/sundbyberg     /fruktkorg/hagalund
+/fruktkorg/bromma         /fruktkorg/alvik          /fruktkorg/nacka
+/fruktkorg/taby           /fruktkorg/arninge        /fruktkorg/jarfalla
+/fruktkorg/huddinge       /fruktkorg/haninge        /fruktkorg/handen
+/fruktkorg/jordbro        /fruktkorg/lanna          /fruktkorg/tyreso
+/fruktkorg/farsta          /fruktkorg/skondal        /fruktkorg/skogas
+/fruktkorg/bandhagen      /fruktkorg/alvsjo         /fruktkorg/hagersten
+/fruktkorg/vastberga      /fruktkorg/fruangen       /fruktkorg/tumba
+/fruktkorg/salem          /fruktkorg/botkyrka       /fruktkorg/stockholm
+```
